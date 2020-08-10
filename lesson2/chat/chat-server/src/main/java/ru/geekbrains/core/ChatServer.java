@@ -7,6 +7,8 @@ import ru.geekbrains.net.ServerSocketThreadListener;
 
 import java.net.Socket;
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChatServer implements ServerSocketThreadListener, MessageSocketThreadListener {
 
@@ -44,7 +46,9 @@ public class ChatServer implements ServerSocketThreadListener, MessageSocketThre
 
     @Override
     public void onSocketAccepted(Socket socket) {
-        this.clientSession = new ClientSessionThread(this, "ClientSessionThread", socket);
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        executorService.execute(() ->
+        this.clientSession = new ClientSessionThread(this, "ClientSessionThread", socket));
     }
 
     @Override

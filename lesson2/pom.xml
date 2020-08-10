@@ -13,6 +13,7 @@
         <module>chat-client</module>
         <module>chat-client</module>
         <module>chat-server</module>
+        <module>ThreadsABC</module>
     </modules>
 
     <dependencies>
