@@ -10,6 +10,8 @@ import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+//Добавил логирование основых событий через logger
+
 public class ChatServer implements ServerSocketThreadListener, MessageSocketThreadListener {
 
     private ServerSocketThread serverSocketThread;
@@ -17,6 +19,7 @@ public class ChatServer implements ServerSocketThreadListener, MessageSocketThre
     private ChatServerListener listener;
     private AuthController authController;
     private Vector<ClientSessionThread> clients = new Vector<>();
+    private static final Logger logger = LogManager.getLogger(ChatServer.class);
 
     public ChatServer(ChatServerListener listener) {
         this.listener = listener;
@@ -30,6 +33,7 @@ public class ChatServer implements ServerSocketThreadListener, MessageSocketThre
         serverSocketThread.start();
         authController = new AuthController();
         authController.init();
+        logger.info("ChatServerStarted");
     }
 
     public void stop() {
@@ -37,11 +41,13 @@ public class ChatServer implements ServerSocketThreadListener, MessageSocketThre
             return;
         }
         serverSocketThread.interrupt();
+        logger.info("ChatServerStopped");
     }
 
     @Override
     public void onClientConnected() {
         logMessage("Client connected");
+        logger.info("Client connected");
     }
 
     @Override
@@ -54,6 +60,7 @@ public class ChatServer implements ServerSocketThreadListener, MessageSocketThre
     @Override
     public void onException(Throwable throwable) {
         throwable.printStackTrace();
+        logger.info("Error on ChatServer: "+throwable.getMessage());
     }
 
     @Override
@@ -84,6 +91,7 @@ public class ChatServer implements ServerSocketThreadListener, MessageSocketThre
 
     private void processAuthorizedUserMessage(String msg) {
         logMessage(msg);
+        logger.info("Client's message:" +msg);
         clientSession.sendMessage("echo: " + msg);
     }
 
@@ -92,6 +100,7 @@ public class ChatServer implements ServerSocketThreadListener, MessageSocketThre
         if (arr.length < 4 ||
                 !arr[0].equals(MessageLibrary.AUTH_METHOD) ||
                 !arr[1].equals(MessageLibrary.AUTH_REQUEST)) {
+            logger.info("Incorrect request: " + msg);
             clientSession.authError("Incorrect request: " + msg);
             return;
         }
